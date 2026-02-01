@@ -1,0 +1,220 @@
+.trade-signal {
+  background: linear-gradient(135deg, rgba(30, 30, 40, 0.95), rgba(20, 20, 30, 0.98));
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.trade-signal--loading,
+.trade-signal--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  color: var(--text-secondary);
+}
+
+.trade-signal__loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--accent-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.trade-signal--error {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.trade-signal__error {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--signal-sell);
+}
+
+.error-icon {
+  font-size: 24px;
+}
+
+/* Header with signal badge and confidence */
+.trade-signal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.trade-signal__signal-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.trade-signal--buy .trade-signal__signal-badge {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1));
+  color: var(--signal-buy);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.trade-signal--sell .trade-signal__signal-badge {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
+  color: var(--signal-sell);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.trade-signal--neutral .trade-signal__signal-badge {
+  background: linear-gradient(135deg, rgba(156, 163, 175, 0.2), rgba(156, 163, 175, 0.1));
+  color: var(--signal-neutral);
+  border: 1px solid rgba(156, 163, 175, 0.3);
+}
+
+.signal-icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* Confidence meter */
+.trade-signal__confidence {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.confidence-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.confidence-bar {
+  width: 80px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.confidence-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.confidence-value {
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 40px;
+}
+
+/* Pattern section */
+.trade-signal__pattern {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.pattern-label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.pattern-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Rationale */
+.trade-signal__rationale {
+  margin-bottom: 20px;
+}
+
+.trade-signal__rationale p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Levels grid */
+.trade-signal__levels {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.level {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.level-label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.level-value {
+  font-size: 18px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.level--entry .level-value {
+  color: var(--accent-primary);
+}
+
+.level--tp .level-value {
+  color: var(--signal-buy);
+}
+
+.level--sl .level-value {
+  color: var(--signal-sell);
+}
+
+.level--rr .level-value {
+  color: var(--text-primary);
+}
+
+/* Footer */
+.trade-signal__footer {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 12px;
+  color: var(--text-secondary);
+}

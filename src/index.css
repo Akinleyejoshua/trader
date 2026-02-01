@@ -1,0 +1,221 @@
+/* CSS Reset and Base Styles */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    /* Colors */
+    --bg-primary: #0a0a12;
+    --bg-secondary: #12121c;
+    --bg-card: rgba(30, 30, 40, 0.95);
+
+    --text-primary: #f0f0f5;
+    --text-secondary: #8b8b99;
+
+    --accent-primary: #6366f1;
+    --accent-secondary: #8b5cf6;
+
+    --signal-buy: #10b981;
+    --signal-sell: #ef4444;
+    --signal-neutral: #9ca3af;
+
+    /* Typography */
+    --font-main: 'Bricolage Grotesque', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+body {
+    font-family: var(--font-main);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Animated gradient background */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+#root {
+    min-height: 100vh;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* Selection */
+::selection {
+    background: rgba(99, 102, 241, 0.3);
+    color: white;
+}
+
+/* App Layout */
+.app {
+    min-height: 100vh;
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.app__header {
+    margin-bottom: 24px;
+}
+
+.app__title {
+    font-size: 28px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 6px;
+}
+
+.app__subtitle {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.app__controls {
+    margin-bottom: 24px;
+}
+
+.app__main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.app__chart-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.app__signal-section {
+    min-height: 400px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .app__main {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .app {
+        padding: 16px;
+    }
+
+    .app__title {
+        font-size: 22px;
+    }
+}
+
+/* Recent signals history */
+.signals-history {
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.signals-history__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.signals-history__header h3 {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.signals-history__list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.signals-history__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    font-size: 13px;
+}
+
+.signals-history__item--buy {
+    border-left: 3px solid var(--signal-buy);
+}
+
+.signals-history__item--sell {
+    border-left: 3px solid var(--signal-sell);
+}
+
+.signals-history__item--neutral {
+    border-left: 3px solid var(--signal-neutral);
+}
+
+.history-signal {
+    font-weight: 600;
+}
+
+.history-pattern {
+    color: var(--text-secondary);
+    flex: 1;
+    margin: 0 16px;
+}
+
+.history-time {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+/* Empty history */
+.signals-history--empty {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 30px;
+}

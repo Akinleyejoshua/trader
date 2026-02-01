@@ -1,0 +1,215 @@
+.control-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(30, 30, 40, 0.95), rgba(20, 20, 30, 0.98));
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+}
+
+.control-panel__section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 160px;
+}
+
+.control-panel__section--connection {
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 12px;
+    margin-left: auto;
+}
+
+.control-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+}
+
+.control-select {
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.control-select:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.control-select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.control-select option {
+    background: #1a1a2e;
+    color: var(--text-primary);
+}
+
+/* Mode toggle */
+.mode-toggle {
+    padding: 10px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mode-toggle--mock {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.3);
+}
+
+.mode-toggle--live {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.mode-toggle:hover {
+    transform: translateY(-1px);
+}
+
+/* Action Buttons (Analyze, Clear) */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    margin-right: 12px;
+}
+
+.action-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+.action-button:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.action-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.action-button--analyze:hover:not(:disabled) {
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.4);
+}
+
+.action-button--clear:hover:not(:disabled) {
+    color: var(--signal-sell);
+    border-color: rgba(239, 68, 68, 0.4);
+}
+
+.action-button svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Connection status */
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.connection-status--connected {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--signal-buy);
+}
+
+.connection-status--connecting {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+}
+
+.connection-status--disconnected,
+.connection-status--error {
+    background: rgba(156, 163, 175, 0.15);
+    color: var(--text-secondary);
+}
+
+.connection-status--market_closed {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--signal-sell);
+}
+
+.status-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.status-icon--spinning {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Connection button */
+.connection-button {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.connection-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+}
+
+.connection-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .control-panel {
+        flex-direction: column;
+    }
+
+    .control-panel__section--connection {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+}
