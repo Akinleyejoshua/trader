@@ -52,9 +52,17 @@
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }
 
-.control-select option {
+.control-select option,
+.control-select optgroup {
     background: #1a1a2e;
     color: var(--text-primary);
+}
+
+.control-select optgroup {
+    font-weight: 700;
+    font-style: normal;
+    background: #151525;
+    /* Slightly darker for contrast */
 }
 
 /* Mode toggle */

@@ -1,9 +1,9 @@
 import { Candle, TradeSetup } from '../types/trading';
+import { calculateEMA, calculateRSI, calculateATR } from './indicators';
 
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
-// System prompt establishing the trading analyst persona
 // System prompt establishing the trading analyst persona
 const SYSTEM_PROMPT = `You are an institutional-grade Algorithmic Trader and Technical Analyst.
 Your task is to analyze the provided array of specific candlestick data and identify HIGH-PROBABILITY trade setups.
@@ -42,16 +42,38 @@ Your task is to analyze the provided array of specific candlestick data and iden
  * Creates the user prompt with dynamic candle data
  */
 function createUserPrompt(symbol: string, timeframe: string, candles: Candle[]): string {
-    const candlesJson = JSON.stringify(candles, null, 2);
+    // Calculate Indicators
+    const ema20 = calculateEMA(candles, 20);
+    const ema50 = calculateEMA(candles, 50);
+    const rsi = calculateRSI(candles, 14);
+    const atr = calculateATR(candles, 14);
+
+    const latest = candles.length - 1;
+    const currentRSI = rsi[latest]?.toFixed(2) || 'N/A';
+    const currentEMA20 = ema20[latest]?.toFixed(2) || 'N/A';
+    const currentEMA50 = ema50[latest]?.toFixed(2) || 'N/A';
+    const currentATR = atr[latest]?.toFixed(4) || 'N/A';
+
+    // Trend Determination using EMA
+    let trend = "SIDEWAYS";
+    if (ema20[latest] && ema50[latest]) {
+        trend = (ema20[latest] > ema50[latest]) ? "UPTREND" : "DOWNTREND";
+    }
+
+    const candlesJson = JSON.stringify(candles.slice(-10), null, 2); // Only show last 10 raw, indicators provide context
 
     return `Market: ${symbol} | Timeframe: ${timeframe}
-Data: ${candlesJson}
+Trend Context: ${trend} (EMA20 vs EMA50)
+Indicators: RSI(14)=${currentRSI} | EMA(20)=${currentEMA20} | EMA(50)=${currentEMA50} | ATR(14)=${currentATR}
 
-Analyze the data above.
-1. Determine the trend from the last 10 candles.
-2. Check for a reversal or continuation pattern in the last 3 candles.
-3. Calculate SL based on local swing high/low.
-4. Calculate TP for > 1:1.5 RR.
+Recent Price Data (Last 10 Candles):
+${candlesJson}
+
+Analyze with these STRICT conditions:
+1. TREND FILTER: Only BUY if Price > EMA20 > EMA50. Only SELL if Price < EMA20 < EMA50.
+2. MOMENTUM: RSI must be NOT overbought (>70) for BUY or oversold (<30) for SELL.
+3. STRUCTURE: Wait for a pullback to EMA or key level.
+4. STOP LOSS: Use ${Number(currentATR) ? (Number(currentATR) * 1.5).toFixed(4) : "1.5x ATR"} if swing low/high is unclear.
 
 Return the JSON setup object.`;
 }
