@@ -75,19 +75,19 @@ export function TradeSignal({ setup, isLoading, error }: TradeSignalProps) {
             <div className="trade-signal__levels">
                 <div className="level level--entry">
                     <span className="level-label">Entry</span>
-                    <span className="level-value">{setup.levels.entry.toFixed(2)}</span>
+                    <span className="level-value">{setup.levels?.entry?.toFixed(2) ?? '---'}</span>
                 </div>
                 <div className="level level--tp">
                     <span className="level-label">Take Profit</span>
-                    <span className="level-value">{setup.levels.tp.toFixed(2)}</span>
+                    <span className="level-value">{setup.levels?.tp?.toFixed(2) ?? '---'}</span>
                 </div>
                 <div className="level level--sl">
                     <span className="level-label">Stop Loss</span>
-                    <span className="level-value">{setup.levels.sl.toFixed(2)}</span>
+                    <span className="level-value">{setup.levels?.sl?.toFixed(2) ?? '---'}</span>
                 </div>
                 <div className="level level--rr">
                     <span className="level-label">Risk:Reward</span>
-                    <span className="level-value">{setup.levels.rr_ratio}</span>
+                    <span className="level-value">{setup.levels?.rr_ratio ?? '---'}</span>
                 </div>
             </div>
 

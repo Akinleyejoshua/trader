@@ -1,6 +1,6 @@
 import { Candle, TradingSymbol, Timeframe, ConnectionStatus } from '../types/trading';
 
-const DERIV_WS_URL = 'wss://ws.derivws.com/websockets/v3?app_id=1089';
+const DERIV_WS_URL = 'wss://ws.binaryws.com/websockets/v3?app_id=1089';
 
 type CandleCloseCallback = (candles: Candle[]) => void;
 type StatusCallback = (status: ConnectionStatus) => void;
@@ -40,6 +40,7 @@ export class DerivWebSocketService {
     private reconnectAttempts = 0;
     private maxReconnectAttempts = 5;
     private reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
+    private disconnectTimeout: ReturnType<typeof setTimeout> | null = null;
     private lastCandleEpoch: number | null = null;
 
     /**
@@ -51,6 +52,28 @@ export class DerivWebSocketService {
         onCandleClose: CandleCloseCallback,
         onStatusChange: StatusCallback
     ): void {
+        // Cancel any pending disconnect
+        if (this.disconnectTimeout) {
+            clearTimeout(this.disconnectTimeout);
+            this.disconnectTimeout = null;
+        }
+
+        // If already connected OR connecting to the same symbol/timeframe, do nothing
+        if ((this.ws?.readyState === WebSocket.OPEN || this.ws?.readyState === WebSocket.CONNECTING) &&
+            this.currentSymbol === symbol &&
+            this.currentTimeframe === timeframe) {
+
+            // Re-attach callbacks just in case they changed (e.g. new React render closures)
+            this.onCandleClose = onCandleClose;
+            this.onStatusChange = onStatusChange;
+
+            // If connected, sync status immediately
+            if (this.ws.readyState === WebSocket.OPEN) {
+                this.onStatusChange('connected');
+            }
+            return;
+        }
+
         this.currentSymbol = symbol;
         this.currentTimeframe = timeframe;
         this.onCandleClose = onCandleClose;
@@ -58,6 +81,23 @@ export class DerivWebSocketService {
 
         this.cleanup();
         this.establishConnection();
+    }
+
+    // ... (establishConnection, etc remain same) ...
+
+    /**
+     * Disconnect from WebSocket with small delay to handle Strict Mode
+     */
+    disconnect(): void {
+        if (this.disconnectTimeout) {
+            clearTimeout(this.disconnectTimeout);
+        }
+
+        this.disconnectTimeout = setTimeout(() => {
+            this.cleanup();
+            this.onStatusChange?.('disconnected');
+            this.disconnectTimeout = null;
+        }, 1000); // 1-second grace period for re-mounts
     }
 
     private establishConnection(): void {
@@ -97,7 +137,7 @@ export class DerivWebSocketService {
         const historyRequest = {
             ticks_history: this.currentSymbol,
             adjust_start_time: 1,
-            count: 20,
+            count: 200, // Increased for indicator calculation
             end: 'latest',
             granularity: parseInt(this.currentTimeframe),
             style: 'candles',
@@ -155,9 +195,9 @@ export class DerivWebSocketService {
                 // Add completed candle to history
                 this.candles.push(newCandle);
 
-                // Keep only last 20 candles
-                if (this.candles.length > 20) {
-                    this.candles = this.candles.slice(-20);
+                // Keep only last 200 candles
+                if (this.candles.length > 200) {
+                    this.candles = this.candles.slice(-200);
                 }
 
                 // Trigger analysis callback
@@ -204,13 +244,7 @@ export class DerivWebSocketService {
         this.lastCandleEpoch = null;
     }
 
-    /**
-     * Disconnect from WebSocket
-     */
-    disconnect(): void {
-        this.cleanup();
-        this.onStatusChange?.('disconnected');
-    }
+
 
     /**
      * Change symbol or timeframe

@@ -124,9 +124,16 @@ export async function analyzeCandles(
 
     try {
         const tradeSetup: TradeSetup = JSON.parse(content);
+
+        // Basic Runtime Validation
+        if (!tradeSetup.signal || !tradeSetup.levels) {
+            throw new Error('Invalid setup format from AI');
+        }
+
         return tradeSetup;
-    } catch {
-        throw new Error('Failed to parse Groq API response as JSON');
+    } catch (e) {
+        console.error('AI Parse/Validation Error:', e);
+        throw new Error('Failed to parse Groq API response as valid JSON setup');
     }
 }
 
