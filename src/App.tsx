@@ -8,8 +8,9 @@ import {
     ConnectionStatus,
     AnalysisStatus,
     TIMEFRAME_NAMES,
+    AIConfig,
 } from './types/trading';
-import { analyzeCandles } from './services/groqService';
+import { aiService } from './services/aiService';
 import { derivWebSocket } from './services/derivWebSocket';
 import { updateTradeStatuses } from './services/verificationService';
 import { TradeSignal } from './components/TradeSignal';
@@ -24,13 +25,19 @@ function App() {
     const savedSymbol = localStorage.getItem('trader_symbol') as TradingSymbol;
     const savedTimeframe = localStorage.getItem('trader_timeframe') as Timeframe;
 
-
     // State
     const [symbol, setSymbol] = useState<TradingSymbol>(savedSymbol || 'R_100');
     const [timeframe, setTimeframe] = useState<Timeframe>(savedTimeframe || '60');
     const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('disconnected');
     const [analysisStatus, setAnalysisStatus] = useState<AnalysisStatus>('idle');
     const [currentSetup, setCurrentSetup] = useState<TradeSetup | null>(null);
+
+    // AI Config State
+    const [aiConfig, setAIConfig] = useState<AIConfig>(() => {
+        const saved = localStorage.getItem('trader_ai_config');
+        return saved ? JSON.parse(saved) : { provider: 'groq', model: 'llama-3.3-70b-versatile' };
+    });
+    const [ollamaModels, setOllamaModels] = useState<string[]>([]);
 
     const [signalHistory, setSignalHistory] = useState<VerifiedTradeSetup[]>(() => {
         try {
@@ -48,6 +55,7 @@ function App() {
             return [];
         }
     });
+
     const [candles, setCandles] = useState<Candle[]>([]);
     const [error, setError] = useState<string | null>(null);
 
@@ -64,10 +72,27 @@ function App() {
         localStorage.setItem('trader_signal_history', JSON.stringify(signalHistory));
     }, [signalHistory]);
 
+    useEffect(() => {
+        localStorage.setItem('trader_ai_config', JSON.stringify(aiConfig));
+    }, [aiConfig]);
+
+    // Fetch Ollama models when provider is ollama
+    useEffect(() => {
+        if (aiConfig.provider === 'ollama') {
+            aiService.getOllamaModels().then(models => {
+                setOllamaModels(models);
+                // If current model is not in list (and list is populated), default to first to avoid sticking to Groq model name
+                if (models.length > 0 && !models.includes(aiConfig.model)) {
+                    setAIConfig(prev => ({ ...prev, model: models[0] }));
+                }
+            });
+        }
+    }, [aiConfig.provider]);
+
     // Refs for preventing duplicate analysis
     const isAnalyzing = useRef(false);
 
-    // Handle candle close - trigger Groq analysis AND verify trades
+    // Handle candle close - trigger AI analysis AND verify trades
     const handleCandleClose = useCallback(async (candleData: Candle[]) => {
         if (candleData.length === 0) return;
 
@@ -77,7 +102,6 @@ function App() {
         // 1. Verify existing pending trades against the new candle
         setSignalHistory(prevHistory => {
             const updatedHistory = updateTradeStatuses(prevHistory, lastCandle);
-            // Optional: Check if any trade just finished and notify user?
             return updatedHistory;
         });
 
@@ -90,7 +114,8 @@ function App() {
         setError(null);
 
         try {
-            const setup = await analyzeCandles(symbol, TIMEFRAME_NAMES[timeframe], candleData);
+            // Use generic aiService with config
+            const setup = await aiService.analyzeCandles(symbol, TIMEFRAME_NAMES[timeframe], candleData, aiConfig);
 
             setCurrentSetup(setup);
 
@@ -109,7 +134,7 @@ function App() {
         } finally {
             isAnalyzing.current = false;
         }
-    }, [symbol, timeframe]);
+    }, [symbol, timeframe, aiConfig]);
 
     // Connect to WebSocket
     const handleConnect = useCallback(() => {
@@ -196,6 +221,9 @@ function App() {
                     onClearHistory={handleClearHistory}
                     onReAnalyze={handleReAnalyze}
                     isAnalyzing={analysisStatus === 'analyzing'}
+                    aiConfig={aiConfig}
+                    onAIConfigChange={setAIConfig}
+                    ollamaModels={ollamaModels}
                 />
             </div>
 

@@ -120,3 +120,12 @@ export type ConnectionStatus = 'connecting' | 'connected' | 'disconnected' | 'er
 
 // Analysis status
 export type AnalysisStatus = 'idle' | 'analyzing' | 'complete' | 'error';
+
+// AI Provider Configuration
+export type AIProvider = 'groq' | 'ollama';
+
+export interface AIConfig {
+    provider: AIProvider;
+    model: string; // e.g., 'llama-3.3-70b-versatile' or 'llama3'
+    baseUrl?: string; // Optional custom URL for Ollama
+}

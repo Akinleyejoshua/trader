@@ -5,6 +5,8 @@ import {
     SYMBOL_NAMES,
     TIMEFRAME_NAMES,
     SYMBOL_GROUPS,
+    AIConfig,
+    AIProvider,
 } from '../types/trading';
 import { HiWifi, HiStatusOffline, HiRefresh, HiTrash, HiLightningBolt } from 'react-icons/hi';
 import './ControlPanel.css';
@@ -20,6 +22,10 @@ interface ControlPanelProps {
     onClearHistory: () => void;
     onReAnalyze: () => void;
     isAnalyzing: boolean;
+    // AI Config
+    aiConfig: AIConfig;
+    onAIConfigChange: (config: AIConfig) => void;
+    ollamaModels: string[];
 }
 
 export function ControlPanel({
@@ -33,9 +39,26 @@ export function ControlPanel({
     onClearHistory,
     onReAnalyze,
     isAnalyzing,
+    // AI Config
+    aiConfig,
+    onAIConfigChange,
+    ollamaModels,
 }: ControlPanelProps) {
     const isConnected = connectionStatus === 'connected';
     const isConnecting = connectionStatus === 'connecting';
+
+    const handleProviderChange = (provider: AIProvider) => {
+        onAIConfigChange({
+            ...aiConfig,
+            provider,
+            // Reset model when switching providers
+            model: provider === 'groq' ? 'llama-3.3-70b-versatile' : (ollamaModels[0] || 'llama3')
+        });
+    };
+
+    const handleModelChange = (model: string) => {
+        onAIConfigChange({ ...aiConfig, model });
+    };
 
     return (
         <div className="control-panel">
@@ -69,6 +92,43 @@ export function ControlPanel({
                         <option key={value} value={value}>{name}</option>
                     ))}
                 </select>
+            </div>
+
+            <div className="control-panel__section">
+                <label className="control-label">AI Provider</label>
+                <div className="toggle-group">
+                    <button
+                        className={`toggle-button ${aiConfig.provider === 'groq' ? 'active' : ''}`}
+                        onClick={() => handleProviderChange('groq')}
+                    >
+                        Groq (Cloud)
+                    </button>
+                    <button
+                        className={`toggle-button ${aiConfig.provider === 'ollama' ? 'active' : ''}`}
+                        onClick={() => handleProviderChange('ollama')}
+                    >
+                        Ollama (Local)
+                    </button>
+                </div>
+            </div>
+
+            <div className="control-panel__section">
+                <label className="control-label">Model</label>
+                {aiConfig.provider === 'groq' ? (
+                    <div className="static-value">Llama 3.3 70B</div>
+                ) : (
+                    <select
+                        className="control-select"
+                        value={aiConfig.model}
+                        onChange={(e) => handleModelChange(e.target.value)}
+                    >
+                        {ollamaModels.length > 0 ? (
+                            ollamaModels.map(m => <option key={m} value={m}>{m}</option>)
+                        ) : (
+                            <option value="llama3">Loading / Default...</option>
+                        )}
+                    </select>
+                )}
             </div>
 
             <div className="control-panel__section control-panel__section--connection">
